@@ -62,8 +62,11 @@ export default function App() {
         addLog('error', '결과 형식을 읽을 수 없습니다');
       }
     } else if (type === 'error') {
-      setError(data);
-      addLog('error', data);
+      // FastAPI 는 {"success":false,"message":"..."} 형태로 보내므로 message 만 꺼냄
+      let msg = data;
+      try { msg = JSON.parse(data).message ?? data; } catch { /* 일반 문자열 */ }
+      setError(msg);
+      addLog('error', msg);
     }
   };
 
