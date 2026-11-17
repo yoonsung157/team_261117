@@ -67,10 +67,36 @@ delivery_service = DeliveryService()
 router = APIRouter(prefix='/api')
 
 
-# POST http://127.0.0.1:8000/api/predict
-@router.post('/predict')
-def predict(item: dict):
-    return delivery_service.predict(item)
+# POST http://127.0.0.1:8000/api/predict/stream
+import json
+from fastapi.responses import StreamingResponse
+
+@router.post('/predict/stream')
+def predict_stream(item: dict):
+
+    def generate():
+        # 기존 서비스의 예측 함수 사용
+        result = delivery_service.predict(item)
+
+        # 서비스에서 실패 결과를 반환한 경우
+        if result.get('success') is False:
+            yield (
+                'event: error\n'
+                f'data: {json.dumps(result, ensure_ascii=False)}\n\n'
+            )
+            return
+
+        # 예측 결과와 R²를 SSE 이벤트로 전달
+        yield (
+            'event: result\n'
+            f'data: {json.dumps(result, ensure_ascii=False)}\n\n'
+        )
+
+    return StreamingResponse(
+        generate(),
+        media_type='text/event-stream')
+
+
 
 
 # 4) FastAPI 생성 및 라우터 연결
