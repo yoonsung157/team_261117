@@ -56,6 +56,7 @@ lon2 = np.radians(df['Delivery_location_longitude'])
 a = (np.sin((lat2 - lat1) / 2) ** 2+ np.cos(lat1) * np.cos(lat2)* np.sin((lon2 - lon1) / 2) ** 2)
 df['distance_km'] = 6371 * 2 * np.arcsin(np.sqrt(a.clip(0, 1)))
 df.loc[~valid_coordinates, 'distance_km'] = np.nan
+
 # 거리 결측값 및 100km 초과 행 제외
 df = df.loc[df['distance_km'].between(0, 100)].copy()
 
@@ -63,7 +64,7 @@ df = df.loc[df['distance_km'].between(0, 100)].copy()
 invalid_rating = (df['Delivery_person_Ratings'].notna()& ~df['Delivery_person_Ratings'].between(1, 5))
 df = df.loc[~invalid_rating].copy()
 
-# 주문 시각에서 시간대 추출 # 원본의 "18:30:00"과 "18:30" 형식을 모두 처리
+# 주문 시각에서 시간대 추출 # 원본의 "18:30:00"과 "18:30" 형식을 모두 처리 --> 시간만 사용
 time_text = df['Time_Orderd'].astype('string')
 order_time = pd.to_datetime(time_text,format='%H:%M:%S',errors='coerce')
 order_time = order_time.fillna(pd.to_datetime(time_text,format='%H:%M',errors='coerce'))
@@ -72,7 +73,7 @@ df['order_hour'] = order_time.dt.hour
 # 도시명 오타 통일
 df['City'] = df['City'].replace('Metropolitian','Metropolitan')
 df = df.reset_index(drop=True)
-print('정제 후 데이터 수:', len(df)) # 정제 후 데이터 수: 41498
+print('정제 후 데이터 수:', len(df)) 
 
 #  8. 특성 및 타깃 구성
 num_cols = [
@@ -189,7 +190,7 @@ print(final_model.named_steps['model'].feature_importances_)
 
 # 최적 파라미터: {'learning_rate': 0.06724618801451224, 'num_leaves': 30, 'max_depth': 9, 'min_child_samples': 16, 'subsample': 0.8448777555981579, 'colsample_bytree': 0.9166672626440991}
 # 최적 트리 수: 142
-# 교차검증 평균 R²: 0.7908356335856417
+# 교차검증 평균 R²: 0.7908356335856417  ``
 # Train R²: 0.8051556646638649
 # Test R²: 0.7922646662176822
 # MAE: 3.3548935308462196 분
