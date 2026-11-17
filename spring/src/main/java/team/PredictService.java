@@ -39,10 +39,10 @@ public class PredictService {
         String vehicle = VEHICLES[ random.nextInt( VEHICLES.length ) ];                 // 4종 중 1개
 
         // 랜덤으로 값들을 정하고 body에 추가
-        body.put( "delivery_person_age", age );
-        body.put( "delivery_person_rating", rating );
+        body.put( "Delivery_person_Age", age );
+        body.put( "Delivery_person_Rating", rating );
         body.put( "multiple_deliveries", multipleDeliveries );
-        body.put( "vehicle", vehicle );
+        body.put( "Type_of_vehicle", vehicle );
 
         // 2-2. React 에 보낼 배정 결과 (JSON 문자열)
         String driver = String.format(
