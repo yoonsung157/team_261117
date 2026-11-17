@@ -125,7 +125,8 @@ const Stars = memo(function Stars({ opacity }) {
 
 /* ---------- 해 / 달 : 시각에 따라 왼쪽 → 오른쪽 포물선 이동 ---------- */
 function Celestial({ hour, weather }) {
-  const arc = (t) => ({ left: `${8 + t * 84}%`, top: `${66 - Math.sin(Math.PI * t) * 54}%` });
+  // 화면 가로 8% → 92% , 세로는 포물선 (transform 으로 이동해야 가벼움)
+  const arc = (t) => ({ transform: `translate(${8 + t * 84}vw, ${66 - Math.sin(Math.PI * t) * 54}vh)` });
   const sunT = (hour - 5) / 14;                    // 05시 뜨고 19시 짐
   const moonT = ((((hour - 18) % 24) + 24) % 24) / 13; // 18시 뜨고 07시 짐
   const dim = SUN_DIM[weather] ?? 1;
