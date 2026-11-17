@@ -36,11 +36,15 @@ public class PredictService {
         int age = 20 + random.nextInt( 20 );                                     // 20 ~ 39세
         double rating = Math.round( ( 4.0 + random.nextDouble() ) * 10 ) / 10.0;        // 4.0 ~ 5.0 (소수 첫째 자리)
         int multipleDeliveries = random.nextInt( 4 );                            // 0 ~ 3건
-        String vehicle = VEHICLES[ random.nextInt( VEHICLES.length ) ];                 // 4종 중 1개
+        String vehicle = VEHICLES[ random.nextInt( VEHICLES.length ) ]; 
+        String orderTime = (String) body.remove("order_time");
+        int orderHour = java.time.LocalTime.parse(orderTime).getHour();                // 4종 중 1개
+        body.put("order_hour", orderHour);
+
 
         // 랜덤으로 값들을 정하고 body에 추가
         body.put( "Delivery_person_Age", age );
-        body.put( "Delivery_person_Rating", rating );
+        body.put( "Delivery_person_Ratings", rating );
         body.put( "multiple_deliveries", multipleDeliveries );
         body.put( "Type_of_vehicle", vehicle );
 
