@@ -34,7 +34,7 @@ const RADIUS = 52;
 const CIRCLE = 2 * Math.PI * RADIUS;
 
 export default function ResultCard({ result, loading, error, orderTime }) {
-  const minutes = Number(result?.prediction);
+  const minutes = Number(result?.prediction ?? result?.predicted_minutes); // FastAPI 는 predicted_minutes 로 보냄
   const r2 = Number(result?.r2);
   const shown = useCountUp(result ? minutes : NaN);
 

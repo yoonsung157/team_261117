@@ -30,21 +30,27 @@ public class PredictService {
     // 2. FastAPI 스트리밍 엔드포인트 호출 → SSE 이벤트를 하나씩 받는 Flux 반환
     // Flux는 List와 다르게 정보를 다 받아서 한번에 보내는 것이 아니라 실시간으로 바로 바로 보냄
     public Flux<ServerSentEvent<String>> predictStream( Map<String, Object> request ) {
-        // 2-1. React 주문 정보(거리, 주문시각, 날씨, 교통, 축제, 도시) 복사 후 배달원 정보 랜덤 배정
-        // 리액트에서 받은 값을 body에 저장
-        Map<String, Object> body = new HashMap<>( request );
+        // 2-1. 배달원 정보 랜덤 배정
         int age = 20 + random.nextInt( 20 );                                     // 20 ~ 39세
         double rating = Math.round( ( 4.0 + random.nextDouble() ) * 10 ) / 10.0;        // 4.0 ~ 5.0 (소수 첫째 자리)
         int multipleDeliveries = random.nextInt( 4 );                            // 0 ~ 3건
         String vehicle = VEHICLES[ random.nextInt( VEHICLES.length ) ];                 // 4종 중 1개
 
-        // 랜덤으로 값들을 정하고 body에 추가
+        // 2-2. React 주문 정보 + 랜덤 배달원 정보 → 모델 학습 컬럼 이름/값으로 변환
+        Map<String, Object> body = new HashMap<>();
+        String city = String.valueOf( request.get( "city" ) );
+        body.put( "distance_km", request.get( "distance_km" ) );
+        body.put( "order_hour", Integer.parseInt( String.valueOf( request.get( "order_time" ) ).split( ":" )[0] ) ); // "19:30" → 19
+        body.put( "Weatherconditions", "conditions " + request.get( "weather" ) );   // "Sunny" → "conditions Sunny"
+        body.put( "Road_traffic_density", request.get( "traffic" ) );
+        body.put( "Festival", request.get( "festival" ) );
+        body.put( "City", "Metropolitian".equals( city ) ? "Metropolitan" : city ); // 모델은 고친 철자로 학습
         body.put( "Delivery_person_Age", age );
-        body.put( "Delivery_person_Rating", rating );
+        body.put( "Delivery_person_Ratings", rating );
         body.put( "multiple_deliveries", multipleDeliveries );
         body.put( "Type_of_vehicle", vehicle );
 
-        // 2-2. React 에 보낼 배정 결과 (JSON 문자열)
+        // 2-3. React 에 보낼 배정 결과 (JSON 문자열)
         String driver = String.format(
                 "{\"age\":%d,\"rating\":%.1f,\"multiple_deliveries\":%d,\"vehicle\":\"%s\"}",
                 age, rating, multipleDeliveries, vehicle );
